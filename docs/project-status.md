@@ -29,7 +29,10 @@ Last updated: 2026-09-27. This records verified milestones and decisions; it is 
 - The migrated standalone Docker container passed eight checks: both GET routes, an unknown path, a query string, POST to each route, `/health/`, and `HEAD /health`. Checks covered status, content type, and bodies where applicable.
 - Frontend is a Next.js starter application. Its lint, TypeScript checks, and production build passed earlier. It is not connected to the backend or deployed through Floci yet.
 - AWS CLI installation initially failed because two root-owned Tailscale symlinks could not be read. The user reports installation succeeded, and `/opt/homebrew/bin/aws` is now present.
-- AWS CLI 2.37.4 is verified. EC2 `DescribeImages` and `DescribeInstances` succeeded against `http://localhost:4566` in `us-east-1` using temporary dummy credentials. The catalog includes Ubuntu 24.04 ARM64 images. No EC2 instances were returned in that account/region. No saved CLI profiles were listed; the dedicated `floci` profile still needs configuring.
+- AWS CLI 2.37.4 is verified. Initial EC2 `DescribeImages` and `DescribeInstances` checks succeeded against `http://localhost:4566` in `us-east-1` using temporary dummy credentials. The catalog includes Ubuntu 24.04 ARM64 images. No EC2 instances were returned in that account/region.
+- The saved `floci` profile is verified through EC2 API calls in `us-east-1`. The installed catalog exposes `ami-ubuntu2404-arm64`, default VPC `vpc-default-us-east-1`, subnet `subnet-default-us-east-1-a`, and `t4g.micro` with two vCPUs and 1024 MiB memory.
+- Application instance `i-9736fd513c201be3e` is running with Ubuntu 24.04 ARM64 and type `t4g.micro`. The application security group is `sg-78cf76c1e614655a2` (`knowledge-app`), and the launch references key pair `floci-learning`. Its SSH endpoint is `localhost:2200`. Ubuntu identity, ARM64 architecture, sshd configuration validation, and the SSH protocol banner are verified. User SSH authentication and application deployment are still pending.
+- EC2 launch CLI syntax is `--count 1`; the initially suggested `--min-count`/`--max-count` options were incorrect and rejected locally. Corrected syntax was validated with the CLI output skeleton before the user's successful launch.
 
 ## Measured traffic baseline
 
@@ -48,8 +51,8 @@ This short test verifies the first target for that endpoint and environment. It 
 
 ## Next milestone
 
-1. Configure the dedicated dummy-credential `floci` profile and verify an EC2 image listing with that profile. API connectivity is verified using temporary credentials; the saved profile is not yet configured.
-2. Choose an image actually supported by the installed Floci version, provision an application instance, and learn access and networking.
+1. Connect to the running instance through SSH as `root` using the user's private key and host port 2200. This username is specific to Floci's key injection; real Ubuntu EC2 normally uses `ubuntu`.
+2. Verify the SSH session and learn access and networking. Instance provisioning and SSH endpoint readiness are already verified.
 3. Deploy the existing backend, verify the deployed routes, and document how to update and roll back it.
 4. Deploy the frontend and connect it to the backend. Measure the deployed environment before further feature work.
 
