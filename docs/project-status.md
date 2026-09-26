@@ -29,6 +29,7 @@ Last updated: 2026-09-27. This records verified milestones and decisions; it is 
 - The migrated standalone Docker container passed eight checks: both GET routes, an unknown path, a query string, POST to each route, `/health/`, and `HEAD /health`. Checks covered status, content type, and bodies where applicable.
 - Frontend is a Next.js starter application. Its lint, TypeScript checks, and production build passed earlier. It is not connected to the backend or deployed through Floci yet.
 - AWS CLI installation initially failed because two root-owned Tailscale symlinks could not be read. The user reports installation succeeded, and `/opt/homebrew/bin/aws` is now present.
+- AWS CLI 2.37.4 is verified. EC2 `DescribeImages` and `DescribeInstances` succeeded against `http://localhost:4566` in `us-east-1` using temporary dummy credentials. The catalog includes Ubuntu 24.04 ARM64 images. No EC2 instances were returned in that account/region. No saved CLI profiles were listed; the dedicated `floci` profile still needs configuring.
 
 ## Measured traffic baseline
 
@@ -47,7 +48,7 @@ This short test verifies the first target for that endpoint and environment. It 
 
 ## Next milestone
 
-1. Verify `aws --version`, configure the dedicated dummy-credential `floci` profile, and list EC2 images through `http://localhost:4566`. Profile configuration and API connectivity are not yet verified.
+1. Configure the dedicated dummy-credential `floci` profile and verify an EC2 image listing with that profile. API connectivity is verified using temporary credentials; the saved profile is not yet configured.
 2. Choose an image actually supported by the installed Floci version, provision an application instance, and learn access and networking.
 3. Deploy the existing backend, verify the deployed routes, and document how to update and roll back it.
 4. Deploy the frontend and connect it to the backend. Measure the deployed environment before further feature work.
