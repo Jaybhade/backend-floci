@@ -33,6 +33,8 @@ Last updated: 2026-09-27. This records verified milestones and decisions; it is 
 - The saved `floci` profile is verified through EC2 API calls in `us-east-1`. The installed catalog exposes `ami-ubuntu2404-arm64`, default VPC `vpc-default-us-east-1`, subnet `subnet-default-us-east-1-a`, and `t4g.micro` with two vCPUs and 1024 MiB memory.
 - Application instance `i-9736fd513c201be3e` is running with Ubuntu 24.04 ARM64 and type `t4g.micro`. The application security group is `sg-78cf76c1e614655a2` (`knowledge-app`), and the launch references key pair `floci-learning`. Its SSH endpoint is `localhost:2200`. Ubuntu identity, ARM64 architecture, sshd configuration validation, and the SSH protocol banner are verified. User SSH authentication and application deployment are still pending.
 - EC2 launch CLI syntax is `--count 1`; the initially suggested `--min-count`/`--max-count` options were incorrect and rejected locally. Corrected syntax was validated with the CLI output skeleton before the user's successful launch.
+- The user has connected over SSH and extracted the checksum-verified Node 25.9.0 Linux ARM64 archive into `/usr/local`. The initially missing `libatomic1` OS package has been installed; Node 25.9.0 and npm 11.12.1 are now verified. Include `libatomic1` with the guest's Node installation prerequisites.
+- Backend commit `e13ce3e0737d37942a138ae0cc1bb80db8b6f5bb` is checked out at `/opt/knowledge-app`, owned by non-root user `knowledgeapp`. Both compiled JavaScript files passed syntax checks, and the production dependency tree contains Express 5.2.1. Process supervision and application port publishing are still pending. Run Git commands in this checkout as `knowledgeapp`, rather than adding a root safe-directory exception.
 
 ## Measured traffic baseline
 
@@ -51,9 +53,9 @@ This short test verifies the first target for that endpoint and environment. It 
 
 ## Next milestone
 
-1. Connect to the running instance through SSH as `root` using the user's private key and host port 2200. This username is specific to Floci's key injection; real Ubuntu EC2 normally uses `ubuntu`.
-2. Verify the SSH session and learn access and networking. Instance provisioning and SSH endpoint readiness are already verified.
-3. Deploy the existing backend, verify the deployed routes, and document how to update and roll back it.
+1. Runtime installation, non-root user creation, checkout, and compilation are verified. Configure Supervisor to run the backend as `knowledgeapp`; this guest is not booted under systemd.
+2. Verify the instance-local HTTP endpoints, publish application port 4000 through the application security group, and verify the resulting host endpoint. Keep deployment configuration in the backend repository.
+3. Verify the deployed routes and document updates, rollback, and guest restart behavior. Supervisor startup after an instance restart is not wired yet.
 4. Deploy the frontend and connect it to the backend. Measure the deployed environment before further feature work.
 
 ## Deliberately deferred
